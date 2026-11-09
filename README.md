@@ -1,6 +1,6 @@
 # Lab 08: Navigating Weighted Graphs with Dijkstra's Algorithm
 
-Name(s): _______________________  
+Name(s): Ashir Ul Haq
 
 ## Introduction
 You are already familiar with Breadth-First Search (BFS) and Depth-First Search (DFS) for exploring graphs. However, what happens when all edges are not created equal? In this lab, we will explore Dijkstra's Algorithm, which allows us to find the shortest path between two vertices in a *weighted* graph.
@@ -15,13 +15,13 @@ BFS is excellent for finding the shortest path in an unweighted graph. Let's see
 
 **Questions:**
 1. If you run a standard BFS starting at Node $A$, looking for Node $D$, which path will the BFS algorithm discover first? Why?
-   > *Your answer here*
+   > BFS finds A → D first because D is one edge away from A. BFS checks nodes one edge away before it checks longer paths.
 
 2. What is the total weight of the path BFS found? What is the total weight of the alternative path? 
-   > *Your answer here*
+   > A → D has a total weight of 100. The other path, A → B → C → D, has a total weight of 2 + 3 + 4 = 9.
 
 3. How does the definition of "shortest path" change when moving from unweighted graphs to weighted graphs?
-   > *Your answer here*
+   > In an unweighted graph, the shortest path uses the fewest edges. In a weighted graph, it has the smallest sum of edge weights.
 
 ---
 
@@ -38,40 +38,40 @@ Starting at Node $A$, trace Dijkstra's algorithm. Fill in the tracker table belo
 *   **`dist` Array:** The current known shortest distance from $A$ to each node. Use $\infty$ for unreachable/unknown nodes.
 *   **`visited` Set:** The set of nodes that have been finalized and whose shortest distances are known.
 
-| Step | Current Node | Neighbors to Check | `dist` Map | `visited` Set | 
-| :--- | :--- | :--- | :--- | :--- | 
-| 0 | $A$ | $B$, $C$ | $A$:0, $B$:4, $C$:2 | { } | 
-| 1 | | | | | 
-| 2 | | | | | 
-| 3 | | | | | 
-| 4 | | | | | 
+The distances and visited set in each row are shown after processing the current node.
+
+| Step | Current Node | Neighbors to Check | `dist` Map | `visited` Set |
+| :--- | :--- | :--- | :--- | :--- |
+| 0 | $A$ | $B$, $C$ | $A$: 0, $B$: 4, $C$: 2, $D$: $\infty$, $E$: $\infty$ | {A} |
+| 1 | $C$ | $B$, $D$, $E$ | $A$: 0, $B$: 3, $C$: 2, $D$: 10, $E$: 12 | {A, C} |
+| 2 | $B$ | $D$ | $A$: 0, $B$: 3, $C$: 2, $D$: 8, $E$: 12 | {A, C, B} |
+| 3 | $D$ | $E$ | $A$: 0, $B$: 3, $C$: 2, $D$: 8, $E$: 10 | {A, C, B, D} |
+| 4 | $E$ | None | $A$: 0, $B$: 3, $C$: 2, $D$: 8, $E$: 10 | {A, C, B, D, E} |
 
 **Conceptual Question:**
 When we add a vertex to the "visited" set, why are we 100% certain we have found the absolute shortest path to that node? 
-> *Your answer here*
+> Dijkstra picks the unvisited node with the smallest known distance. Any other route would first have to reach an unvisited node that is at least that far away. Since all edge weights are zero or positive, the rest of that route can only keep the same cost or make it higher.
 
 ---
 
 ## Part 3: Assumptions
 
-Dijkstra's algorithm relies on an assumption about the weights. Let's see what happens when we break it. Consider the following weighted graph, which contains a negative edge:
-
-![Part 3 Graph](./part3.png)
+Dijkstra's algorithm relies on an assumption about the weights. Let's see what happens when we break it. In this graph, A to B costs 2, A to C costs 1, and B to C costs −5.
 
 **Instructions:**
 Trace Dijkstra's algorithm starting from Node $A$ to find the shortest path to Node $C$.
 
 1. Which node does Dijkstra's algorithm visit first after $A$?
-   > *Your answer here*
+   > It visits C next because its current distance is 1, while B's is 2.
 
 2. What will Dijkstra's algorithm declare as the shortest path to $C$, and what is its weight?
-   > *Your answer here*
+   > Dijkstra returns A → C with a total weight of 1.
 
 3. Look at the graph manually. What is the *actual* shortest path from $A$ to $C$, and what is its total weight? 
-   > *Your answer here*
+   > The shortest path without repeating any nodes is A → B → C. Its total weight is 2 + (−5) = −3.
 
 4. **The Trap:** Explain exactly *why* Dijkstra's algorithm failed to find the correct shortest path in this scenario.
-   > *Your answer here*
+   > Dijkstra finalizes C at 1 before it checks the route through B. The edge from B to C has weight −5, which brings that route down to −3. Dijkstra assumes edge weights are zero or positive, so it treats C's distance as final too early.
 
 ---
 
@@ -95,8 +95,8 @@ Standard Dijkstra's algorithm only understands *edges* and *edge weights*. It do
 
 1. How should you represent the paths with stairs in your graph so the algorithm never tries to use them?
 
-   > *Your answer here*
+   > Leave paths with stairs out of the graph so the robot can never pick them.
 
 2. How can you account for the $3$-minute waiting time at busy crosswalk intersections using *only* edge weights? (Hint: Think about how you could modify the weights of edges connecting to that intersection).
 
-   > *Your answer here*
+   > Add the 3-minute wait to every edge that leaves a busy crosswalk. Those edges cost 5 minutes, and edges leaving other intersections cost 2. For a two-way sidewalk, give each direction its own weight. This charges the wait when the robot leaves a busy crosswalk, so it pays no wait if the crosswalk is its destination.
